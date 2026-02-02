@@ -2,43 +2,496 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Mi Agenda</title>
+    <title>Arcade Agenda - Pump It Up</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts para estilo gaming -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&family=Ubuntu+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --neon-blue: #0ff0fc;
+            --neon-pink: #ff00ff;
+            --neon-green: #39ff14;
+            --neon-yellow: #fff01f;
+            --dark-bg: #0a0a16;
+            --darker-bg: #050510;
+            --purple-glow: #9d4edd;
+            --arcade-blue: #00bfff;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(157, 78, 221, 0.15) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 191, 255, 0.15) 0%, transparent 20%);
+            color: white;
+            font-family: 'Ubuntu Mono', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Efecto de escaneo CRT */
+        .crt-effect::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        /* Estilo para título principal */
+        .main-title {
+            font-family: 'Press Start 2P', cursive;
+            color: var(--neon-yellow);
+            text-shadow: 0 0 10px var(--neon-yellow), 0 0 20px var(--neon-yellow);
+            text-align: center;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            position: relative;
+            padding: 20px 0;
+        }
+        
+        .main-title::before {
+            content: "🕹️";
+            margin-right: 15px;
+            font-size: 1.2em;
+        }
+        
+        .main-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--neon-pink), var(--neon-blue), transparent);
+            border-radius: 2px;
+        }
+        
+        /* Estilo de tarjeta arcade */
+        .arcade-card {
+            background-color: rgba(10, 10, 30, 0.9);
+            border: 3px solid var(--neon-blue);
+            border-radius: 0;
+            box-shadow: 
+                0 0 15px var(--neon-blue),
+                inset 0 0 15px rgba(0, 191, 255, 0.2);
+            padding: 25px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .arcade-card:hover {
+            box-shadow: 
+                0 0 25px var(--neon-pink),
+                inset 0 0 20px rgba(255, 0, 255, 0.3);
+            border-color: var(--neon-pink);
+            transform: translateY(-5px);
+        }
+        
+        .arcade-card::before {
+            content: "";
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink), var(--neon-green), var(--neon-yellow));
+            z-index: -1;
+            filter: blur(5px);
+            opacity: 0.5;
+        }
+        
+        /* Estilo para iframe del calendario */
+        .calendar-container {
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+            border-radius: 5px;
+            overflow: hidden;
+            background-color: black;
+        }
+        
+        /* Información de sesión */
+        .session-info {
+            background-color: rgba(0, 0, 20, 0.8);
+            border-left: 5px solid var(--neon-pink);
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .session-info h4 {
+            color: var(--neon-pink);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+        }
+        
+        /* Botones estilo arcade */
+        .arcade-btn {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            background-color: var(--darker-bg);
+            color: var(--neon-green);
+            border: 2px solid var(--neon-green);
+            border-radius: 0;
+            padding: 10px 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .arcade-btn:hover {
+            color: var(--neon-yellow);
+            background-color: rgba(57, 255, 20, 0.1);
+            box-shadow: 0 0 15px var(--neon-green);
+            transform: scale(1.05);
+        }
+        
+        .arcade-btn::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .arcade-btn:hover::after {
+            left: 100%;
+        }
+        
+        /* Encabezados de sección */
+        .section-header {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-blue);
+            border-bottom: 2px solid var(--neon-blue);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .section-header::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100px;
+            height: 2px;
+            background: var(--neon-pink);
+        }
+        
+        /* Efectos de texto neón */
+        .neon-text {
+            text-shadow: 
+                0 0 5px currentColor,
+                0 0 10px currentColor,
+                0 0 20px currentColor;
+        }
+        
+        /* Panel de estadísticas */
+        .stats-panel {
+            background-color: rgba(5, 5, 20, 0.9);
+            border: 2px solid var(--purple-glow);
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2em;
+            color: var(--neon-yellow);
+            font-weight: 900;
+        }
+        
+        .stat-label {
+            color: var(--neon-blue);
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Pie de página */
+        .footer {
+            margin-top: 40px;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid rgba(0, 191, 255, 0.3);
+            color: var(--neon-blue);
+            font-size: 0.9em;
+        }
+        
+        /* Efecto de parpadeo para títulos */
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .blink {
+            animation: blink 1.5s infinite;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 1.5em;
+            }
+            
+            .arcade-card {
+                padding: 15px;
+            }
+        }
+    </style>
 </head>
 
-<body class="bg-light">
-
-<div class="container py-4">
-    
-    <h1 class="text-center mb-4">📅 Mi Agenda</h1>
-
-    <div class="row justify-content-center">
-        <div class="col-12 col-lg-10">
-
-            <div class="card shadow">
-                <div class="card-body">
-
-                    <!-- Calendario responsive -->
-                    <div class="ratio ratio-16x9">
+<body class="crt-effect">
+    <div class="container py-4">
+        <!-- Título principal -->
+        <h1 class="main-title blink">ARCADE AGENDA - PUMP IT UP</h1>
+        
+        <div class="row">
+            <div class="col-12 col-lg-8">
+                <!-- Calendario -->
+                <div class="arcade-card">
+                    <h3 class="section-header">
+                        <i class="fas fa-calendar-alt me-2"></i>CALENDARIO DE SESIONES
+                    </h3>
+                    
+                    <div class="calendar-container ratio ratio-16x9">
                         <iframe 
                             src="https://calendar.google.com/calendar/embed?src=2c72ddcf41aa27b8ddb84d947d52b2a2d38e6bb82aed46ef427937c260cbb75a%40group.calendar.google.com&ctz=America%2FMexico_City"
-                            style="border:0"
+                            style="border:0; filter: invert(90%) hue-rotate(180deg);"
                             allowfullscreen
                             loading="lazy">
                         </iframe>
                     </div>
-
+                    
+                    <div class="session-info">
+                        <h4><i class="fas fa-gamepad me-2"></i>PRÓXIMA SESIÓN</h4>
+                        <p id="next-session">Cargando información de la próxima sesión...</p>
+                        <button class="arcade-btn mt-2" id="add-session-btn">
+                            <i class="fas fa-plus-circle me-2"></i>AGENDAR NUEVA SESIÓN
+                        </button>
+                    </div>
                 </div>
             </div>
-
+            
+            <div class="col-12 col-lg-4">
+                <!-- Panel de información -->
+                <div class="arcade-card">
+                    <h3 class="section-header">
+                        <i class="fas fa-info-circle me-2"></i>INFORMACIÓN
+                    </h3>
+                    
+                    <div class="mb-4">
+                        <h5 class="neon-text" style="color: var(--neon-green);">
+                            <i class="fas fa-user me-2"></i>JUGADOR ACTUAL
+                        </h5>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-dark p-2 rounded me-3">
+                                <i class="fas fa-gamepad fa-2x" style="color: var(--neon-pink);"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0">ARCADE_PLAYER</h5>
+                                <small class="text-muted">Nivel: Experto</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5 class="neon-text" style="color: var(--neon-blue);">
+                            <i class="fas fa-trophy me-2"></i>LOGROS RECIENTES
+                        </h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-star me-2" style="color: var(--neon-yellow);"></i>Full Combo en "Love is a Danger Zone"</li>
+                            <li class="mb-2"><i class="fas fa-fire me-2" style="color: var(--neon-pink);"></i>Nuevo récord: 850,000 puntos</li>
+                            <li><i class="fas fa-bolt me-2" style="color: var(--neon-green);"></i>10 sesiones consecutivas esta semana</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="stats-panel">
+                        <h5 class="text-center mb-3" style="color: var(--neon-pink);">ESTADÍSTICAS</h5>
+                        <div class="row text-center">
+                            <div class="col-6 stat-item">
+                                <div class="stat-value" id="sessions-count">24</div>
+                                <div class="stat-label">Sesiones</div>
+                            </div>
+                            <div class="col-6 stat-item">
+                                <div class="stat-value" id="hours-count">36</div>
+                                <div class="stat-label">Horas</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Acciones rápidas -->
+                <div class="arcade-card">
+                    <h3 class="section-header">
+                        <i class="fas fa-bolt me-2"></i>ACCIONES RÁPIDAS
+                    </h3>
+                    
+                    <div class="d-grid gap-2">
+                        <button class="arcade-btn" id="quick-session-btn">
+                            <i class="fas fa-play-circle me-2"></i>SESIÓN EXPRÉS (1h)
+                        </button>
+                        <button class="arcade-btn" style="border-color: var(--neon-pink); color: var(--neon-pink);" id="invite-friend-btn">
+                            <i class="fas fa-users me-2"></i>INVITAR AMIGO
+                        </button>
+                        <button class="arcade-btn" style="border-color: var(--neon-yellow); color: var(--neon-yellow);" id="view-stats-btn">
+                            <i class="fas fa-chart-line me-2"></i>VER ESTADÍSTICAS
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pie de página -->
+        <div class="footer">
+            <p class="mb-2">🎮 ARCADE AGENDA - PUMP IT UP EDITION 🎮</p>
+            <p class="small">Sistema de gestión de sesiones de juego | Diseño retro gaming</p>
+            <p class="small mt-2">
+                <i class="fas fa-headset me-1"></i> ¡Mantén el ritmo y alcanza nuevos records!
+            </p>
         </div>
     </div>
-
-</div>
-
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Simulación de datos dinámicos
+        document.addEventListener('DOMContentLoaded', function() {
+            // Actualizar próxima sesión
+            const nextSessionElement = document.getElementById('next-session');
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(18, 0, 0);
+            
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+            nextSessionElement.textContent = `${tomorrow.toLocaleDateString('es-MX', options)} - Duración: 2 horas`;
+            
+            // Botón para agendar nueva sesión
+            document.getElementById('add-session-btn').addEventListener('click', function() {
+                alert('🔔 Función de agendar nueva sesión activada!\nRedirigiendo a Google Calendar...');
+                window.open('https://calendar.google.com/calendar/u/0/r/eventedit', '_blank');
+            });
+            
+            // Botón de sesión exprés
+            document.getElementById('quick-session-btn').addEventListener('click', function() {
+                const quickSessionTime = new Date(now.getTime() + 30 * 60000); // 30 minutos desde ahora
+                alert(`⏱️ Sesión exprés agendada para: ${quickSessionTime.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'})}`);
+                
+                // Incrementar contadores
+                let sessionsCount = parseInt(document.getElementById('sessions-count').textContent);
+                let hoursCount = parseInt(document.getElementById('hours-count').textContent);
+                
+                document.getElementById('sessions-count').textContent = sessionsCount + 1;
+                document.getElementById('hours-count').textContent = hoursCount + 1;
+            });
+            
+            // Botón de invitar amigo
+            document.getElementById('invite-friend-btn').addEventListener('click', function() {
+                alert('👥 ¡Función de invitación activada!\nComparte el enlace del calendario con tus amigos.');
+            });
+            
+            // Botón de ver estadísticas
+            document.getElementById('view-stats-btn').addEventListener('click', function() {
+                alert('📊 Abriendo panel de estadísticas detalladas...');
+            });
+            
+            // Efecto de parpadeo para elementos importantes
+            const blinkElements = document.querySelectorAll('.blink');
+            setInterval(() => {
+                blinkElements.forEach(el => {
+                    el.classList.toggle('blink');
+                    setTimeout(() => el.classList.toggle('blink'), 500);
+                });
+            }, 3000);
+            
+            // Simular carga de datos
+            setTimeout(() => {
+                // Simular actualización de datos
+                const statValues = document.querySelectorAll('.stat-value');
+                statValues.forEach(stat => {
+                    const originalValue = parseInt(stat.textContent);
+                    let current = originalValue;
+                    const target = originalValue + Math.floor(Math.random() * 5) + 1;
+                    
+                    const interval = setInterval(() => {
+                        if (current < target) {
+                            current++;
+                            stat.textContent = current;
+                        } else {
+                            clearInterval(interval);
+                        }
+                    }, 100);
+                });
+            }, 1000);
+        });
+        
+        // Efecto de sonido al hacer clic en botones (simulado)
+        document.querySelectorAll('.arcade-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Crear efecto visual
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = event.clientX - rect.left - size/2;
+                const y = event.clientY - rect.top - size/2;
+                
+                ripple.style.cssText = `
+                    position: absolute;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.7);
+                    transform: scale(0);
+                    animation: ripple-animation 0.6s linear;
+                    width: ${size}px;
+                    height: ${size}px;
+                    top: ${y}px;
+                    left: ${x}px;
+                `;
+                
+                this.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+        
+        // Agregar estilo para el efecto de ripple
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple-animation {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
 </html>
-
